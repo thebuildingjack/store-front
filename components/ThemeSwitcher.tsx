@@ -19,6 +19,7 @@ export default function ThemeSwitcher() {
 
   return (
     <button
+      suppressHydrationWarning
       onClick={toggle}
       className="px-4 py-2 rounded-xl border border-accent text-text font-base text-sm"
     >
