@@ -2,13 +2,11 @@
 
 import { useState } from "react";
 
-function getInitialTheme(): "light" | "dark" {
-  if (typeof window === "undefined") return "light";
-  return (localStorage.getItem("theme") as "light" | "dark") || "light";
-}
-
 export default function ThemeSwitcher() {
-  const [theme, setTheme] = useState<"light" | "dark">(getInitialTheme);
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    if (typeof window === "undefined") return "light";
+    return (document.documentElement.getAttribute("data-theme") as "light" | "dark") || "light";
+  });
 
   const toggle = () => {
     const next = theme === "light" ? "dark" : "light";
