@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
-const protectedRoutes = ["/account", "/orders", "/checkout"];
+const protectedRoutes = ["/account", "/checkout"];
 const authRoutes = ["/login", "/register"];
 
-export function middleware(req: NextRequest) {
+export default function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
   const { pathname } = req.nextUrl;
 
-  // If trying to access a protected route without a token → redirect to login
+  // No token + trying to access protected route → redirect to login
   if (protectedRoutes.some((route) => pathname.startsWith(route))) {
     if (!token) {
       return NextResponse.redirect(new URL("/login", req.url));
@@ -17,18 +17,19 @@ export function middleware(req: NextRequest) {
     try {
       jwt.verify(token, process.env.JWT_SECRET!);
     } catch {
+      // Token expired or invalid → redirect to login
       return NextResponse.redirect(new URL("/login", req.url));
     }
   }
 
-  // If already logged in and trying to access login/register → redirect to home
+  // Already logged in + trying to access login/register → redirect home
   if (authRoutes.some((route) => pathname.startsWith(route))) {
     if (token) {
       try {
         jwt.verify(token, process.env.JWT_SECRET!);
         return NextResponse.redirect(new URL("/", req.url));
       } catch {
-        // Token invalid, let them through to login
+        // Token invalid, let them through
       }
     }
   }
