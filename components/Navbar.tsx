@@ -1,21 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ThemeSwitcher from "./ThemeSwitcher";
 import { useCart } from "@/context/CartContext";
 
 export default function Navbar() {
+  
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
   const { totalItems } = useCart();
+  
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
     router.push(`/search?q=${encodeURIComponent(query)}`);
   };
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 bg-surface border-b border-muted/20 backdrop-blur-sm">
@@ -56,12 +62,23 @@ export default function Navbar() {
             <AccountIcon />
           </Link>
 
-          <Link
+          {/* <Link
             href="/cart"
             className="relative p-2 rounded-xl text-muted hover:text-text hover:bg-bg transition-colors"
           >
             <CartIcon />
             {totalItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-accent text-bg text-[10px] font-bold rounded-full flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
+          </Link> */}
+          <Link
+            href="/cart"
+            className="relative p-2 rounded-xl text-muted hover:text-text hover:bg-bg transition-colors"
+          >
+            <CartIcon />
+            {mounted && totalItems > 0 && (
               <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-accent text-bg text-[10px] font-bold rounded-full flex items-center justify-center">
                 {totalItems}
               </span>
