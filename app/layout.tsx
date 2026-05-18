@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
-import "./globals.css";
-import Navbar from "@/components/Navbar";
+import "@/app/globals.css";
+import NavbarWrapper from "@/components/NavbarWrapper";
 
 const inter = Inter({
   variable: "--font-base",
@@ -52,7 +52,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-bg text-text font-base">
-        <Navbar />
+        <NavbarWrapper />
         {children}
       </body>
     </html>

@@ -210,7 +210,6 @@ export default function RegisterPage() {
   return (
     <main className="min-h-screen bg-bg flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <ThemeSwitcher />
         <h1 className="font-heading text-4xl text-text mb-2">Create account</h1>
         <p className="text-muted text-sm mb-8">Start shopping with us today</p>
 
