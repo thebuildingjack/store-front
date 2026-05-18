@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "@/app/globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
+import { CartProvider } from "@/context/CartContext";
 
 const inter = Inter({
   variable: "--font-base",
@@ -52,8 +53,10 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-bg text-text font-base">
-        <NavbarWrapper />
-        {children}
+        <CartProvider>
+          <NavbarWrapper />
+          {children}
+        </CartProvider>
       </body>
     </html>
   );

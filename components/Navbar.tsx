@@ -4,10 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ThemeSwitcher from "./ThemeSwitcher";
+import { useCart } from "@/context/CartContext";
 
 export default function Navbar() {
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const { totalItems } = useCart();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,17 +19,13 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-surface border-b border-muted/20 backdrop-blur-sm">
-      {/* Top bar */}
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
-
-        {/* Logo */}
         <Link href="/" className="shrink-0">
           <span className="font-heading text-2xl text-accent tracking-tight">
             Bazar
           </span>
         </Link>
 
-        {/* Search bar */}
         <form
           onSubmit={handleSearch}
           className="flex-1 flex items-center bg-bg border border-muted/30 rounded-xl overflow-hidden focus-within:border-accent transition-colors"
@@ -40,7 +38,7 @@ export default function Navbar() {
             className="flex-1 bg-transparent px-4 py-2.5 text-sm text-text outline-none placeholder:text-muted"
           />
           <button
-            title="submit"
+          title="submit"
             type="submit"
             className="px-4 py-2.5 text-muted hover:text-accent transition-colors"
           >
@@ -48,36 +46,31 @@ export default function Navbar() {
           </button>
         </form>
 
-        {/* Right icons */}
         <div className="flex items-center gap-3 shrink-0">
           <ThemeSwitcher />
 
-          {/* Account */}
           <Link
             href="/account"
             className="p-2 rounded-xl text-muted hover:text-text hover:bg-bg transition-colors"
-            title="Account"
           >
             <AccountIcon />
           </Link>
 
-          {/* Cart */}
           <Link
             href="/cart"
             className="relative p-2 rounded-xl text-muted hover:text-text hover:bg-bg transition-colors"
-            title="Cart"
           >
             <CartIcon />
-            {/* Cart badge — we'll wire this up when we build the cart */}
-            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-accent text-bg text-[10px] font-bold rounded-full flex items-center justify-center">
-              0
-            </span>
+            {totalItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-accent text-bg text-[10px] font-bold rounded-full flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
           </Link>
         </div>
       </div>
 
-      {/* Category nav */}
-      <nav className="max-w-7xl mx-auto px-4 pb-2 flex items-center gap-6 overflow-x-auto scrollbar-hide">
+      <nav className="max-w-7xl mx-auto px-4 pb-2 flex items-center gap-6 overflow-x-auto">
         {["All", "Clothes", "Appliances", "Gadgets"].map((cat) => (
           <Link
             key={cat}

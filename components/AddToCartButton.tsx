@@ -2,21 +2,21 @@
 
 import { useState } from "react";
 import { Product } from "@/lib/products";
+import { useCart } from "@/context/CartContext";
 
 export default function AddToCartButton({ product }: { product: Product }) {
+  const { addItem } = useCart();
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
   const handleAdd = () => {
-    // We'll wire this to real cart state soon
-    // For now just show feedback
+    addItem(product, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Quantity selector */}
       <div className="flex items-center gap-3">
         <p className="text-text text-sm font-medium">Quantity</p>
         <div className="flex items-center border border-muted/30 rounded-xl overflow-hidden">
@@ -38,13 +38,10 @@ export default function AddToCartButton({ product }: { product: Product }) {
         </div>
       </div>
 
-      {/* Add to cart button */}
       <button
         onClick={handleAdd}
         className={`w-full py-4 rounded-xl font-medium text-sm transition-all ${
-          added
-            ? "bg-green-500 text-white"
-            : "bg-accent text-bg hover:opacity-90"
+          added ? "bg-green-500 text-white" : "bg-accent text-bg hover:opacity-90"
         }`}
       >
         {added ? "✓ Added to cart" : "Add to cart"}
