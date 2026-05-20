@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ThemeSwitcher from "./ThemeSwitcher";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
   
@@ -12,6 +13,7 @@ export default function Navbar() {
   const [query, setQuery] = useState("");
   const [mounted, setMounted] = useState(false);
   const { totalItems } = useCart();
+  const { user } = useAuth();
   
 
   const handleSearch = (e: React.FormEvent) => {
@@ -57,9 +59,14 @@ export default function Navbar() {
 
           <Link
             href="/account"
-            className="p-2 rounded-xl text-muted hover:text-text hover:bg-bg transition-colors"
+            className="flex items-center gap-2 p-2 rounded-xl text-muted hover:text-text hover:bg-bg transition-colors"
           >
             <AccountIcon />
+            {user && (
+              <span className="text-text text-sm font-medium hidden sm:block">
+                {user.name.split(" ")[0]}
+              </span>
+            )}
           </Link>
 
           {/* <Link

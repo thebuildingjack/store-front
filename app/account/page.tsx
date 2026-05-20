@@ -4,11 +4,13 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Suspense } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 function AccountContent() {
   const searchParams = useSearchParams();
   const orderPlaced = searchParams.get("order") === "placed";
   const router = useRouter();
+  const { user } = useAuth();
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -19,7 +21,12 @@ function AccountContent() {
     <main className="flex-1 bg-bg">
       <div className="max-w-3xl mx-auto px-4 py-10 flex flex-col gap-6">
         <div className="flex items-center justify-between">
-          <h1 className="font-heading text-4xl text-text">My account</h1>
+          <div className="flex flex-col gap-1">
+            <h1 className="font-heading text-4xl text-text">My account</h1>
+            {user && (
+              <p className="text-muted text-sm">Welcome back, {user.name}</p>
+            )}
+          </div>
           <button
             onClick={handleLogout}
             className="text-sm text-muted hover:text-red-500 transition-colors"
