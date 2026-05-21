@@ -133,6 +133,38 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [syncing, setSyncing] = useState(true);
 
+   // Load cart from localStorage
+  const loadLocalCart = () => {
+    try {
+      const stored = localStorage.getItem("cart");
+      setItems(stored ? JSON.parse(stored) : []);
+    } catch {
+      setItems([]);
+    }
+  };
+
+    // Fetch cart from the server and map productIds back to full product objects
+  const fetchServerCart = async () => {
+    try {
+      const res = await fetch("/api/cart");
+      const data = await res.json();
+
+      // The server only stores productId and quantity
+      // We need to match those back to the full product objects from our list
+      const mapped: CartItem[] = data.items
+        .map((item: { productId: string; quantity: number }) => {
+          const product = allProducts.find((p) => p.id === item.productId);
+          if (!product) return null;
+          return { product, quantity: item.quantity };
+        })
+        .filter(Boolean);
+
+      setItems(mapped);
+    } catch {
+      setItems([]);
+    }
+  };
+
   // On mount — check if user is logged in and load the right cart
   useEffect(() => {
     const init = async () => {
@@ -158,44 +190,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     init();
   }, []);
 
-  // Load cart from localStorage
-  const loadLocalCart = () => {
-    try {
-      const stored = localStorage.getItem("cart");
-      setItems(stored ? JSON.parse(stored) : []);
-    } catch {
-      setItems([]);
-    }
-  };
-
   // Save cart to localStorage whenever items change (only for guests)
   useEffect(() => {
     if (!isLoggedIn) {
       localStorage.setItem("cart", JSON.stringify(items));
     }
   }, [items, isLoggedIn]);
-
-  // Fetch cart from the server and map productIds back to full product objects
-  const fetchServerCart = async () => {
-    try {
-      const res = await fetch("/api/cart");
-      const data = await res.json();
-
-      // The server only stores productId and quantity
-      // We need to match those back to the full product objects from our list
-      const mapped: CartItem[] = data.items
-        .map((item: { productId: string; quantity: number }) => {
-          const product = allProducts.find((p) => p.id === item.productId);
-          if (!product) return null;
-          return { product, quantity: item.quantity };
-        })
-        .filter(Boolean);
-
-      setItems(mapped);
-    } catch {
-      setItems([]);
-    }
-  };
 
   const addItem = async (product: Product, quantity: number) => {
     if (isLoggedIn) {

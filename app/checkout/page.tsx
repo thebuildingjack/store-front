@@ -4,11 +4,13 @@ import { useState } from "react";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/products";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     fullName: "",
     phone: "",
@@ -18,18 +20,60 @@ export default function CheckoutPage() {
   });
 
   const handleOrder = async () => {
-    // Validate all fields are filled
+    // Client side validation
     const empty = Object.values(form).some((v) => !v.trim());
     if (empty) {
-      alert("Please fill in all fields");
+      setError("Please fill in all fields");
+      return;
+    }
+
+    if (items.length === 0) {
+      setError("Your cart is empty");
       return;
     }
 
     setLoading(true);
-    // Simulate order placement — we'll wire this to a real API later
-    await new Promise((r) => setTimeout(r, 1500));
-    clearCart();
-    router.push("/account?order=placed");
+    setError("");
+
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          address: form.address,
+          city: form.city,
+          state: form.state,
+          phone: form.phone,
+          total: totalPrice,
+          items: items.map((i) => ({
+            productId: i.product.id,
+            quantity: i.quantity,
+          })),
+        }),
+      });
+
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        setError("Server error. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      if (!res.ok) {
+        setError(data.error || "Something went wrong");
+        setLoading(false);
+        return;
+      }
+
+      // Clear cart state on the frontend
+      clearCart();
+      router.push("/account?order=placed");
+    } catch {
+      setError("Network error. Check your connection and try again.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -37,13 +81,17 @@ export default function CheckoutPage() {
       <div className="max-w-5xl mx-auto px-4 py-10">
         <h1 className="font-heading text-4xl text-text mb-8">Checkout</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {error && (
+          <p className="text-red-500 text-sm bg-red-500/10 px-4 py-3 rounded-xl border border-red-500/20 mb-6">
+            {error}
+          </p>
+        )}
 
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Delivery form */}
           <div className="flex flex-col gap-6">
             <div className="bg-surface border border-muted/20 rounded-2xl p-6 flex flex-col gap-4">
               <h2 className="font-heading text-xl text-text">Delivery details</h2>
-
               {[
                 { key: "fullName", label: "Full name", placeholder: "John Doe" },
                 { key: "phone", label: "Phone number", placeholder: "080xxxxxxxx" },
@@ -64,7 +112,6 @@ export default function CheckoutPage() {
               ))}
             </div>
 
-            {/* Payment — placeholder for now */}
             <div className="bg-surface border border-muted/20 rounded-2xl p-6 flex flex-col gap-3">
               <h2 className="font-heading text-xl text-text">Payment</h2>
               <div className="flex items-center gap-3 bg-bg border border-accent/30 rounded-xl px-4 py-3">
@@ -81,12 +128,11 @@ export default function CheckoutPage() {
           <div className="flex flex-col gap-4 h-fit">
             <div className="bg-surface border border-muted/20 rounded-2xl p-6 flex flex-col gap-4">
               <h2 className="font-heading text-xl text-text">Order summary</h2>
-
               <div className="flex flex-col gap-3">
                 {items.map(({ product, quantity }) => (
                   <div key={product.id} className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-lg overflow-hidden bg-bg shrink-0">
-                      <img
+                      <Image
                         src={product.image}
                         alt={product.name}
                         className="w-full h-full object-cover"
@@ -102,14 +148,12 @@ export default function CheckoutPage() {
                   </div>
                 ))}
               </div>
-
               <div className="border-t border-muted/20 pt-3 flex justify-between">
                 <span className="text-text font-medium">Total</span>
                 <span className="text-accent font-heading text-xl">
                   {formatPrice(totalPrice)}
                 </span>
               </div>
-
               <button
                 onClick={handleOrder}
                 disabled={loading || items.length === 0}

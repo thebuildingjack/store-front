@@ -32,8 +32,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  useEffect(() => {
+/*   useEffect(() => {
     fetchUser();
+  }, []);
+ */
+
+  useEffect(() => {
+  let cancelled = false;
+
+  const load = async () => {
+    try {
+      const res = await fetch("/api/auth/me");
+      const data = await res.json();
+      if (!cancelled) setUser(data.user);
+      } catch {
+        if (!cancelled) setUser(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    load();
+
+    // Cleanup function — if the component unmounts before the fetch
+    // completes, cancelled = true prevents setState from being called
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return (
