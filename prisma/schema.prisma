@@ -17,6 +17,20 @@ model User {
   orders    Order[]
 }
 
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  image       String
+  category    String
+  rating      Float    @default(0)
+  reviews     Int      @default(0)
+  inStock     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model Cart {
   id        String     @id @default(cuid())
   userId    String     @unique

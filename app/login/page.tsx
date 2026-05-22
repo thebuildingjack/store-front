@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import ThemeSwitcher from "@/components/ThemeSwitcher";
 
 export default function LoginPage() {
   const router = useRouter();

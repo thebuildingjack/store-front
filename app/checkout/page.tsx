@@ -131,10 +131,11 @@ export default function CheckoutPage() {
               <div className="flex flex-col gap-3">
                 {items.map(({ product, quantity }) => (
                   <div key={product.id} className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-bg shrink-0">
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-bg shrink-0">
                       <Image
                         src={product.image}
                         alt={product.name}
+                        fill
                         className="w-full h-full object-cover"
                       />
                     </div>

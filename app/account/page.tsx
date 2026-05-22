@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState, Suspense } from "react";
 import { formatPrice } from "@/lib/products";
-import { products } from "@/lib/products";
-import Image from "next/image";
 
 type OrderItem = {
   id: string;
@@ -140,31 +138,19 @@ function AccountContent() {
 
                 {/* Order items */}
                 <div className="flex flex-col gap-2">
-                  {order.items.map((item) => {
-                    const product = products.find((p) => p.id === item.productId);
-                    return (
-                      <div key={item.id} className="flex items-center gap-3">
-                        {product && (
-                          <div className="w-10 h-10 rounded-lg overflow-hidden bg-bg shrink-0">
-                            <Image
-                              src={product.image}
-                              alt={product.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-text text-xs font-medium truncate">
-                            {product?.name || item.productId}
-                          </p>
-                          <p className="text-muted text-xs">Qty: {item.quantity}</p>
-                        </div>
-                        <p className="text-text text-xs font-medium shrink-0">
-                          {formatPrice(item.price * item.quantity)}
+                  {order.items.map((item) => (
+                    <div key={item.id} className="flex items-center gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-text text-xs font-medium truncate">
+                          Product ID: {item.productId.slice(-8).toUpperCase()}
                         </p>
+                        <p className="text-muted text-xs">Qty: {item.quantity}</p>
                       </div>
-                    );
-                  })}
+                      <p className="text-text text-xs font-medium shrink-0">
+                        {formatPrice(item.price * item.quantity)}
+                      </p>
+                    </div>
+                  ))}
                 </div>
 
                 {/* Order footer */}
